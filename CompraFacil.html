@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompraFácil</title>
+<style>
+:root{--morado:#8054c7;--claro:#eee5ff;--fondo:#f7f5fc;--texto:#393344;--rojo:#e64c68;--verde:#35a879}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:var(--fondo);color:var(--texto)}
+.contenedor{display:flex;min-height:100vh}
+.sidebar{width:240px;background:white;padding:25px 18px;border-right:1px solid #e5dcef}
+.logo{text-align:center;margin-bottom:35px}.logo .bolsa{font-size:48px}.logo h2{color:var(--morado);margin:10px 0}.logo p{color:#81798d;font-size:13px;line-height:1.5}
+.menu a{display:block;padding:14px;margin:8px 0;text-decoration:none;color:var(--texto);border-radius:12px;cursor:pointer}
+.menu a:hover,.menu a.activo{background:var(--claro);color:var(--morado)}
+main{flex:1;padding:28px;min-width:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
+header h1{font-size:27px}header p{color:#81798d;margin-top:7px}.usuario{background:white;padding:12px 18px;border-radius:14px;box-shadow:0 3px 12px #ddd5e8}
+.busqueda{width:100%;padding:14px;border:1px solid #e0d5ef;border-radius:12px;outline:none;margin-bottom:22px}
+.busqueda:focus,input:focus{border-color:var(--morado)}
+.rejilla{display:grid;grid-template-columns:1.6fr 1fr;gap:22px}
+.tarjeta{background:white;border-radius:18px;padding:23px;margin-bottom:22px;box-shadow:0 4px 15px #e9e2f1}
+.tarjeta h2{font-size:19px;margin-bottom:18px}.etiqueta{display:inline-block;padding:7px 12px;background:var(--claro);color:var(--morado);border-radius:20px;font-size:12px;margin-bottom:15px}
+.producto{display:grid;grid-template-columns:1fr 100px 60px 35px;align-items:center;gap:10px;padding:15px 0;border-bottom:1px solid #eee8f5}
+.producto strong{display:block;margin-bottom:5px}.producto small{color:#898094}.precio{font-weight:bold;font-size:14px}.cantidad{width:60px;padding:8px;border:1px solid #ddd2ed;border-radius:8px}
+button{cursor:pointer;border:none;border-radius:10px;padding:11px 15px;font-weight:bold}
+.btn-principal{background:var(--morado);color:white}.btn-principal:hover{background:#6840ad}.btn-eliminar{background:#ffe8ed;color:var(--rojo);padding:8px}.boton-agregar{margin-top:18px;width:100%}
+.formulario{display:grid;gap:12px;margin-bottom:18px}
+input,select{padding:12px;border:1px solid #ddd2ed;border-radius:9px;background:white;width:100%}
+.resumen-linea{display:flex;justify-content:space-between;margin:17px 0;gap:10px}
+.total{margin-top:20px;padding:20px;text-align:center;background:var(--claro);border:2px solid var(--morado);border-radius:15px}
+.total span{display:block;font-size:13px;color:#6e5a91}.total h2{color:var(--morado);font-size:27px;margin:8px 0 0}
+.acciones h3{margin-bottom:15px}.acciones button{display:block;width:100%;margin-bottom:10px;background:#f0e8ff;color:var(--morado);text-align:left}
+.tarea{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid #eee8f5}
+.tarea small{display:block;margin-top:6px;color:#81798d}.estado{font-size:12px;font-weight:bold;color:var(--rojo)}.estado.completa{color:var(--verde)}
+.oculto{display:none!important}.mensaje-vacio{color:#81798d;padding:15px 0}footer{text-align:center;color:#91889e;padding:20px;font-size:13px}
+@media(max-width:900px){.contenedor{flex-direction:column}.sidebar{width:100%;padding:15px}.logo{margin-bottom:12px}.logo .bolsa{font-size:35px}.menu{display:flex;flex-wrap:wrap;justify-content:center}.menu a{padding:10px;font-size:13px}main{padding:18px}.rejilla{grid-template-columns:1fr}}
+@media(max-width:480px){header{align-items:flex-start;flex-direction:column}.producto{grid-template-columns:1fr 65px 45px 32px;gap:6px}.producto strong{font-size:13px}.precio{font-size:12px}.cantidad{width:45px}.tarea{grid-template-columns:1fr auto}.tarea .btn-eliminar{grid-column:2}}
+@media print{.sidebar,.busqueda,button,footer{display:none!important}body{background:white}.tarjeta{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="contenedor">
+<aside class="sidebar">
+  <div class="logo"><div class="bolsa">🛍️</div><h2>CompraFácil</h2><p>Calcula, organiza y controla tus compras.</p></div>
+  <nav class="menu">
+    <a class="activo" onclick="mostrarSeccion('inicio',this)">🏠 Inicio</a>
+    <a onclick="mostrarSeccion('inicio',this)">🧮 Calculadora</a>
+    <a onclick="mostrarSeccion('tareas',this)">☑️ Tareas</a>
+    <a onclick="mostrarSeccion('compras',this)">🛍️ Mis compras</a>
+    <a onclick="mostrarSeccion('configuracion',this)">⚙️ Configuración</a>
+  </nav>
+</aside>
+<main>
+<header><div><h1 id="titulo">Calculadora de compras</h1><p>Organiza tus productos y calcula tu total.</p></div><div class="usuario">👤 Hola</div></header>
+<input type="text" id="buscar" class="busqueda" placeholder="🔍 Buscar productos o tareas..." oninput="buscarElementos()">
+<section id="inicio" class="seccion">
+<div class="rejilla"><div>
+<div class="tarjeta" id="tarjetaProductos">
+<span class="etiqueta">🧮 Calculadora de compras</span><h2>Productos</h2>
+<div id="listaProductos"></div>
+<button class="btn-principal boton-agregar" onclick="mostrarSeccion('compras')">+ Agregar producto</button>
+<button class="btn-principal boton-agregar" onclick="calcularTotal()">Calcular total</button>
+</div>
+<div class="tarjeta"><h2>📋 Mis tareas</h2><div id="listaTareasInicio"></div><button class="btn-principal" onclick="mostrarSeccion('tareas')">+ Nueva tarea</button></div>
+</div>
+<div>
+<div class="tarjeta"><h2>🛍️ Resumen de tu compra</h2>
+<div class="resumen-linea"><span>Productos</span><strong id="cantidadProductos">3</strong></div>
+<div class="resumen-linea"><span>Subtotal</span><strong id="subtotal">$250.000</strong></div>
+<div class="resumen-linea"><span>IVA (19%)</span><strong id="iva">$47.500</strong></div>
+<div class="total"><span>TOTAL A PAGAR</span><h2 id="total">$297.500</h2></div>
+</div>
+<div class="tarjeta acciones"><h3>⚡ Acciones rápidas</h3><button onclick="mostrarSeccion('tareas')">☑️ Ver mis tareas</button><button onclick="mostrarSeccion('compras')">➕ Agregar productos</button><button onclick="window.print()">🖨️ Imprimir resumen</button></div>
+</div></div>
+</section>
+<section id="compras" class="seccion oculto"><div class="tarjeta"><h2>➕ Agregar producto</h2>
+<form class="formulario" onsubmit="agregarProducto(event)">
+<input id="nombreProducto" type="text" placeholder="Nombre del producto" required>
+<input id="precioProducto" type="number" min="1" step="1" placeholder="Precio en pesos colombianos" required>
+<input id="unidadesProducto" type="number" min="1" value="1" placeholder="Cantidad" required>
+<button class="btn-principal" type="submit">Agregar a la compra</button>
+</form><p id="mensajeProducto"></p><br><button class="btn-principal" onclick="mostrarSeccion('inicio')">Volver a la calculadora</button>
+</div></section>
+<section id="tareas" class="seccion oculto"><div class="tarjeta"><h2>☑️ Organizador de tareas</h2>
+<form class="formulario" onsubmit="agregarTarea(event)"><input type="text" id="nombreTarea" placeholder="Escribe una tarea" required><label for="fechaTarea">Fecha de entrega:</label><input type="date" id="fechaTarea" required><button class="btn-principal" type="submit">+ Nueva tarea</button></form>
+<h3>Mis tareas</h3><div id="listaTareas"></div>
+</div></section>
+<section id="configuracion" class="seccion oculto"><div class="tarjeta"><h2>⚙️ Configuración</h2><p>IVA aplicado a las compras: <strong>19%</strong></p><br><p>Moneda: <strong>Peso colombiano (COP)</strong></p><br><p>Aplicación: <strong>CompraFácil</strong></p></div></section>
+<footer>CompraFácil © 2026 | Organiza tus compras fácilmente 💜</footer>
+</main></div>
+<script>
+let productos=[
+{id:1,nombre:"Camisa",precio:50000,cantidad:1,activo:true},
+{id:2,nombre:"Pantalón",precio:80000,cantidad:1,activo:true},
+{id:3,nombre:"Tenis",precio:120000,cantidad:1,activo:true}
+];
+let tareas=[
+{nombre:"Útiles escolares",fecha:"2026-10-15",completa:false},
+{nombre:"Tarea cálculo",fecha:"2026-10-14",completa:true},
+{nombre:"Pago de internet",fecha:"2026-10-16",completa:false},
+{nombre:"Hacer compras",fecha:"2026-10-18",completa:false}
+];
+function dinero(valor){return valor.toLocaleString("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0})}
+function mostrarSeccion(nombre,enlace){
+document.querySelectorAll(".seccion").forEach(s=>s.classList.add("oculto"));
+document.getElementById(nombre).classList.remove("oculto");
+document.querySelectorAll(".menu a").forEach(a=>a.classList.remove("activo"));
+if(enlace)enlace.classList.add("activo");
+else document.querySelectorAll(".menu a").forEach(a=>{if(a.getAttribute("onclick").includes(nombre))a.classList.add("activo")});
+const titulos={inicio:"Calculadora de compras",tareas:"Organizador de tareas",compras:"Mis compras",configuracion:"Configuración"};
+document.getElementById("titulo").textContent=titulos[nombre]||"CompraFácil";
+document.getElementById("buscar").value="";buscarElementos();
+}
+function dibujarProductos(){
+const lista=document.getElementById("listaProductos");lista.innerHTML="";
+productos.filter(p=>p.activo).forEach(p=>{
+const fila=document.createElement("div");fila.className="producto";
+const info=document.createElement("div");const nombre=document.createElement("strong");nombre.textContent=p.nombre;
+const small=document.createElement("small");small.textContent="Producto";info.append(nombre,small);
+const precio=document.createElement("span");precio.className="precio";precio.textContent=dinero(p.precio);
+const cantidad=document.createElement("input");cantidad.className="cantidad";cantidad.type="number";cantidad.min="1";cantidad.value=p.cantidad;cantidad.setAttribute("aria-label","Cantidad de "+p.nombre);
+cantidad.addEventListener("change",()=>{p.cantidad=Math.max(1,parseInt(cantidad.value)||1);cantidad.value=p.cantidad;calcularTotal()});
+const eliminar=document.createElement("button");eliminar.className="btn-eliminar";eliminar.textContent="🗑️";eliminar.setAttribute("aria-label","Eliminar "+p.nombre);eliminar.onclick=()=>{p.activo=false;dibujarProductos();calcularTotal()};
+fila.append(info,precio,cantidad,eliminar);lista.appendChild(fila);
+});}
+function calcularTotal(){let subtotal=0,cantidadTotal=0;productos.filter(p=>p.activo).forEach(p=>{subtotal+=p.precio*p.cantidad;cantidadTotal+=p.cantidad});
+const iva=subtotal*.19;document.getElementById("cantidadProductos").textContent=cantidadTotal;document.getElementById("subtotal").textContent=dinero(subtotal);document.getElementById("iva").textContent=dinero(iva);document.getElementById("total").textContent=dinero(subtotal+iva)}
+function agregarProducto(e){e.preventDefault();const nombre=document.getElementById("nombreProducto").value.trim(),precio=Number(document.getElementById("precioProducto").value),cantidad=Number(document.getElementById("unidadesProducto").value);
+if(!nombre||!Number.isSafeInteger(precio)||precio<=0||!Number.isSafeInteger(cantidad)||cantidad<=0){alert("Ingresa datos válidos.");return}
+productos.push({id:Math.max(0,...productos.map(p=>p.id))+1,nombre,precio,cantidad,activo:true});dibujarProductos();calcularTotal();
+document.getElementById("nombreProducto").value="";document.getElementById("precioProducto").value="";document.getElementById("unidadesProducto").value="1";document.getElementById("mensajeProducto").textContent="¡Producto agregado correctamente!";mostrarSeccion("inicio")}
+function renderizarTareas(){
+const lista=document.getElementById("listaTareas"),inicio=document.getElementById("listaTareasInicio");lista.innerHTML="";inicio.innerHTML="";
+if(!tareas.length){lista.textContent="No tienes tareas todavía.";inicio.textContent="Agrega tu primera tarea.";return}
+tareas.forEach((t,i)=>{const fila=document.createElement("div");fila.className="tarea";const info=document.createElement("div"),nombre=document.createElement("strong"),fecha=document.createElement("small");nombre.textContent=t.nombre;fecha.textContent="Entrega: "+t.fecha;info.append(nombre,fecha);
+const estado=document.createElement("span");estado.className=t.completa?"estado completa":"estado";estado.textContent=t.completa?"Completada":"Pendiente";
+const cambiar=document.createElement("button");cambiar.className="btn-principal";cambiar.textContent=t.completa?"↩️":"✓";cambiar.title="Cambiar estado";cambiar.onclick=()=>{tareas[i].completa=!tareas[i].completa;renderizarTareas()};
+const borrar=document.createElement("button");borrar.className="btn-eliminar";borrar.textContent="🗑️";borrar.title="Eliminar tarea";borrar.onclick=()=>{tareas.splice(i,1);renderizarTareas()};
+fila.append(info,estado,cambiar,borrar);lista.appendChild(fila);
+if(i<4){const resumen=document.createElement("div");resumen.className="tarea";const texto=document.createElement("div"),n=document.createElement("strong"),f=document.createElement("small");n.textContent=t.nombre;f.textContent=t.fecha;texto.append(n,f);const est=document.createElement("span");est.className=t.completa?"estado completa":"estado";est.textContent=t.completa?"Completada":"Pendiente";resumen.append(texto,est);inicio.appendChild(resumen)}
+});buscarElementos()}
+function agregarTarea(e){e.preventDefault();const nombre=document.getElementById("nombreTarea").value.trim(),fecha=document.getElementById("fechaTarea").value;if(!nombre||!fecha)return;tareas.push({nombre,fecha,completa:false});document.getElementById("nombreTarea").value="";document.getElementById("fechaTarea").value="";renderizarTareas()}
+function buscarElementos(){const q=document.getElementById("buscar").value.toLowerCase().trim();document.querySelectorAll("#listaProductos .producto,#listaTareas .tarea,#listaTareasInicio .tarea").forEach(f=>f.classList.toggle("oculto",!f.textContent.toLowerCase().includes(q)))}
+dibujarProductos();calcularTotal();renderizarTareas();
+</script>
+</body>
+</html>
